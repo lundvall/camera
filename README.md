@@ -1,6 +1,10 @@
+
 # Camera
 
+[![GoDoc](https://godoc.org/github.com/lundvall/camera?status.svg)](https://godoc.org/github.com/lundvall/camera)
+
 Camera Remote API for Go.
+
 
 ## About
 
