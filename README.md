@@ -11,13 +11,13 @@ Automate your photography with Go and create things like sophisticated time-laps
 To use this library with your camera, you must enable the remote control feature. Please see (developer.sony.com)[https://developer.sony.com/devices/cameras/] for a full list of supported devices.
 
 ```
-	cam := NewCamera()
-	res, err := cam.Execute(ActTakePicture)
-	if err != nil {
-		log.Fatal(err)
-	}
+cam := NewCamera()
+res, err := cam.Execute(ActTakePicture)
+if err != nil {
+	log.Fatal(err)
+}
 
-	log.Println(res)
+log.Println(res)
 ```
 
 # License
