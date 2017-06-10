@@ -8,7 +8,7 @@ Automate your photography with Go and create things like sophisticated time-laps
 
 ## Usage
 
-To use this library with your camera, you must enable the remote control feature. Please see (developer.sony.com)[https://developer.sony.com/devices/cameras/] for a full list of supported devices.
+To use this library with your camera, you must enable the remote control feature. Please see [developer.sony.com](https://developer.sony.com/devices/cameras/) for a full list of supported devices.
 
 ```
 cam := NewCamera()
