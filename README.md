@@ -16,7 +16,7 @@ To use this library with your camera, you must enable the remote control feature
 
 ```
 cam := camera.NewCamera()
-cam.Execute(camera.ActTakePicture)
+cam.Action(camera.ActTakePicture)
 ```
 
 # License

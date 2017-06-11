@@ -6,7 +6,7 @@ import (
 
 func ExampleNewCamera() {
 	cam := NewCamera()
-	res, err := cam.Execute(ActTakePicture)
+	res, err := cam.Action(ActTakePicture)
 	if err != nil {
 		log.Fatal(err)
 	}

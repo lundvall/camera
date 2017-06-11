@@ -15,36 +15,65 @@ type Camera struct {
 	client Client
 }
 
-// Execute command on camera
-func (c *Camera) Execute(cmd Command) (map[string]interface{}, error) {
-	reader, err := c.client.Send(cmd)
+// Action sends Request to Camera
+func (c *Camera) Action(req Request) (Response, error) {
+	var res Response
+	bs, err := json.Marshal(&req)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	return c.read(reader)
-}
+	reader, err := c.client.Send(bytes.NewReader(bs))
+	if err != nil {
+		return res, err
+	}
 
-func (c *Camera) read(reader io.ReadCloser) (map[string]interface{}, error) {
 	defer reader.Close()
-
-	var result map[string]interface{}
 	decoder := json.NewDecoder(reader)
-	err := decoder.Decode(&result)
+	err = decoder.Decode(&res)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	if err, ok := result["error"]; ok {
-		return nil, fmt.Errorf("unexpected error: %v", err)
+	if len(res.Error) == 2 {
+		return res, fmt.Errorf("response: %.f %s", res.Error[0], res.Error[1])
 	}
 
-	return result, nil
+	return res, nil
 }
 
-// NewCamera camera with a client and default API URL
+// NewCamera with a client and default API URL
 func NewCamera() Camera {
 	return Camera{Client{api}}
+}
+
+// Response from Camera
+type Response struct {
+	ID     int           `json:"id"`
+	Result []interface{} `json:"result"`
+	Error  []interface{} `json:"error"`
+}
+
+// Params of Request
+type Params []interface{}
+
+// Request to Camera
+type Request struct {
+	ID      int         `json:"id"`
+	Version string      `json:"version"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params"`
+}
+
+// NewRequest ...
+func NewRequest(method string) Request {
+	params := make(Params, 0)
+	return NewParamsRequest(method, params)
+}
+
+// NewParamsRequest ...
+func NewParamsRequest(method string, params interface{}) Request {
+	return Request{id, version, method, params}
 }
 
 // Client for HTTP calls
@@ -52,22 +81,13 @@ type Client struct {
 	URL string
 }
 
-// Send Command
-func (c *Client) Send(cmd Command) (io.ReadCloser, error) {
-	reader, err := reader(cmd)
-	if err != nil {
-		return nil, err
-	}
-
+// Send request
+func (c *Client) Send(reader io.Reader) (io.ReadCloser, error) {
 	req, err := http.NewRequest(http.MethodPost, api, reader)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.do(req)
-}
-
-func (c *Client) do(req *http.Request) (io.ReadCloser, error) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -79,13 +99,4 @@ func (c *Client) do(req *http.Request) (io.ReadCloser, error) {
 	}
 
 	return res.Body, nil
-}
-
-func reader(c Command) (io.Reader, error) {
-	body, err := json.Marshal(&c)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes.NewReader(body), nil
 }
